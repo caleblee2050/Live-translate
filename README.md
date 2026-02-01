@@ -2,6 +2,14 @@
 
 Gemini Multimodal Live API를 활용한 실시간 다국어(러시아어/중국어/베트남어) 설교 통역 시스템
 
+## 🚀 프로덕션 배포
+
+| 페이지 | URL |
+|--------|-----|
+| 청취자 | https://live-translate-production-1a87.up.railway.app |
+| 설교자 | https://live-translate-production-1a87.up.railway.app/speaker.html |
+| 관리자 | https://live-translate-production-1a87.up.railway.app/admin.html |
+
 ## 주요 기능
 
 - ✅ 실시간 음성 스트리밍 (S2ST)
