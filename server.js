@@ -126,7 +126,7 @@ io.on('connection', (socket) => {
     });
 
     // 설교자 오디오 스트림 수신
-    socket.on('audio-stream', (data) => {
+    socket.on('audio-stream', async (data) => {
         if (socket.clientType !== 'speaker') {
             return;
         }
@@ -135,12 +135,16 @@ io.on('connection', (socket) => {
             // Base64 디코딩
             const audioBuffer = Buffer.from(data.audio, 'base64');
 
-            // 모든 언어 핸들러로 전송
-            Object.values(geminiHandlers).forEach(handler => {
-                if (handler.isConnected) {
-                    handler.streamAudio(audioBuffer);
+            console.log(`🎙️ 오디오 수신: ${audioBuffer.length} bytes`);
+
+            // 모든 언어 핸들러로 전송 (재연결은 streamAudio 내부에서 처리)
+            for (const [lang, handler] of Object.entries(geminiHandlers)) {
+                try {
+                    await handler.streamAudio(audioBuffer);
+                } catch (err) {
+                    console.error(`❌ 오디오 전송 실패 [${lang}]:`, err.message);
                 }
-            });
+            }
         } catch (error) {
             console.error('오디오 스트림 처리 오류:', error);
         }
