@@ -169,20 +169,40 @@ io.on('connection', (socket) => {
 /**
  * 관리자 API: 컨텍스트 주입
  */
-app.post('/api/inject-context', (req, res) => {
+app.post('/api/inject-context', async (req, res) => {
     try {
         const { sermonText, keywords } = req.body;
 
-        // 모든 언어 핸들러에 컨텍스트 주입
-        Object.values(geminiHandlers).forEach(handler => {
-            handler.injectContext(sermonText, keywords);
-        });
-
-        console.log('📝 컨텍스트 주입 완료');
+        console.log('📝 컨텍스트 주입 요청 수신...');
         console.log('   설교 본문:', sermonText?.substring(0, 50) + '...');
         console.log('   키워드:', keywords);
 
-        res.json({ success: true, message: '컨텍스트가 주입되었습니다.' });
+        // 모든 언어 핸들러에 컨텍스트 주입 (세션 재연결 대기)
+        const results = await Promise.all(
+            Object.entries(geminiHandlers).map(async ([lang, handler]) => {
+                try {
+                    const success = await handler.injectContext(sermonText, keywords);
+                    return { lang, success };
+                } catch (error) {
+                    console.error(`❌ 컨텍스트 주입 실패 [${lang}]:`, error.message);
+                    return { lang, success: false };
+                }
+            })
+        );
+
+        const allSuccess = results.every(r => r.success);
+        const failedLangs = results.filter(r => !r.success).map(r => r.lang);
+
+        if (allSuccess) {
+            console.log('✅ 모든 언어에 컨텍스트 적용 완료');
+            res.json({ success: true, message: '컨텍스트가 모든 언어에 적용되었습니다.' });
+        } else {
+            console.log('⚠️ 일부 언어 컨텍스트 적용 실패:', failedLangs);
+            res.json({
+                success: true,
+                message: `컨텍스트가 적용되었습니다. (일부 언어 재연결 실패: ${failedLangs.join(', ')})`
+            });
+        }
     } catch (error) {
         console.error('컨텍스트 주입 오류:', error);
         res.status(500).json({ success: false, message: error.message });
