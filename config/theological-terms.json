@@ -1,0 +1,108 @@
+{
+    "terms": {
+        "은혜": {
+            "ru": "благодать",
+            "zh": "恩典",
+            "vi": "ân điển",
+            "context": "God's unmerited favor and love"
+        },
+        "구원": {
+            "ru": "спасение",
+            "zh": "救恩",
+            "vi": "sự cứu rỗi",
+            "context": "Salvation through Jesus Christ"
+        },
+        "성령": {
+            "ru": "Святой Дух",
+            "zh": "圣灵",
+            "vi": "Chúa Thánh Thần",
+            "context": "The Holy Spirit"
+        },
+        "복음": {
+            "ru": "Евангелие",
+            "zh": "福音",
+            "vi": "Tin Mừng",
+            "context": "The Gospel"
+        },
+        "회개": {
+            "ru": "покаяние",
+            "zh": "悔改",
+            "vi": "sự ăn năn",
+            "context": "Repentance"
+        },
+        "믿음": {
+            "ru": "вера",
+            "zh": "信心",
+            "vi": "đức tin",
+            "context": "Faith"
+        },
+        "축복": {
+            "ru": "благословение",
+            "zh": "祝福",
+            "vi": "phước lành",
+            "context": "Blessing"
+        },
+        "기도": {
+            "ru": "молитва",
+            "zh": "祷告",
+            "vi": "cầu nguyện",
+            "context": "Prayer"
+        },
+        "예수님": {
+            "ru": "Иисус",
+            "zh": "耶稣",
+            "vi": "Chúa Giê-su",
+            "context": "Jesus Christ"
+        },
+        "하나님": {
+            "ru": "Бог",
+            "zh": "上帝",
+            "vi": "Đức Chúa Trời",
+            "context": "God"
+        }
+    },
+    "biblicalNames": {
+        "아브라함": {
+            "ru": "Авраам",
+            "zh": "亚伯拉罕",
+            "vi": "Áp-ra-ham"
+        },
+        "모세": {
+            "ru": "Моисей",
+            "zh": "摩西",
+            "vi": "Môi-se"
+        },
+        "다윗": {
+            "ru": "Давид",
+            "zh": "大卫",
+            "vi": "Đa-vít"
+        },
+        "바울": {
+            "ru": "Павел",
+            "zh": "保罗",
+            "vi": "Phao-lô"
+        },
+        "베드로": {
+            "ru": "Петр",
+            "zh": "彼得",
+            "vi": "Phi-e-rơ"
+        }
+    },
+    "biblicalPlaces": {
+        "예루살렘": {
+            "ru": "Иерусалим",
+            "zh": "耶路撒冷",
+            "vi": "Giê-ru-sa-lem"
+        },
+        "갈릴리": {
+            "ru": "Галилея",
+            "zh": "加利利",
+            "vi": "Ga-li-lê"
+        },
+        "베들레헴": {
+            "ru": "Вифлеем",
+            "zh": "伯利恒",
+            "vi": "Bết-lê-hem"
+        }
+    }
+}

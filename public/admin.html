@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관리자 패널 - 실시간 설교 통역</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;600;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <span class="logo-icon">⚙️</span>
+                <div class="logo-text">
+                    <h1>관리자 패널</h1>
+                    <p>Administrator Panel</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- 시스템 상태 -->
+        <div class="card">
+            <h2 class="card-title">
+                <span>📊</span>
+                시스템 상태
+            </h2>
+            <div id="systemStatus">
+                <p>로딩 중...</p>
+            </div>
+        </div>
+
+        <!-- 컨텍스트 주입 -->
+        <div class="card">
+            <h2 class="card-title">
+                <span>📝</span>
+                설교 컨텍스트 사전 로딩
+            </h2>
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+                설교 시작 전, 오늘의 설교 본문과 핵심 키워드를 입력하면 번역 정확도가 향상됩니다.
+            </p>
+
+            <form id="contextForm" onsubmit="submitContext(event)">
+                <div class="form-group">
+                    <label class="form-label" for="sermonText">
+                        📖 오늘의 설교 본문 (예: 요한복음 3:16)
+                    </label>
+                    <textarea id="sermonText" class="form-textarea"
+                        placeholder="하나님이 세상을 이처럼 사랑하사 독생자를 주셨으니 이는 그를 믿는 자마다 멸망하지 않고 영생을 얻게 하려 하심이라 (요한복음 3:16)"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="keywordInput">
+                        🔑 핵심 키워드 (Enter로 추가)
+                    </label>
+                    <input type="text" id="keywordInput" class="form-input" placeholder="예: 은혜, 구원, 사랑"
+                        onkeypress="addKeyword(event)">
+                    <div id="keywords" class="tags-container"></div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <span>✅</span>
+                    컨텍스트 주입
+                </button>
+            </form>
+        </div>
+
+        <!-- 신학 용어 참고 -->
+        <div class="card">
+            <h2 class="card-title">
+                <span>📚</span>
+                신학 용어 참고
+            </h2>
+            <div id="termsList"></div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2026 A4K.ai | Powered by Gemini Multimodal Live API</p>
+    </footer>
+
+    <script src="/js/admin.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>실시간 설교 통역 - 청취자</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- 헤더 -->
+  <header class="header">
+    <div class="header-content">
+      <div class="logo">
+        <span class="logo-icon">🌐</span>
+        <div class="logo-text">
+          <h1>실시간 설교 통역</h1>
+          <p>Live Translation Service</p>
+        </div>
+      </div>
+      <div id="connectionStatus" class="status-badge" style="display: none;">
+        <span class="status-dot"></span>
+        <span>연결됨</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- 메인 컨텐츠 -->
+  <main class="container">
+    <!-- 언어 선택 -->
+    <div class="card" id="languageSelection">
+      <h2 class="card-title">
+        <span>🌍</span>
+        언어를 선택하세요
+      </h2>
+      <div class="language-grid">
+        <button class="language-btn" data-lang="ru" onclick="selectLanguage('ru')">
+          <div class="flag">🇷🇺</div>
+          <div class="name">Русский</div>
+          <div class="code">러시아어</div>
+        </button>
+        <button class="language-btn" data-lang="zh" onclick="selectLanguage('zh')">
+          <div class="flag">🇨🇳</div>
+          <div class="name">中文</div>
+          <div class="code">중국어</div>
+        </button>
+        <button class="language-btn" data-lang="vi" onclick="selectLanguage('vi')">
+          <div class="flag">🇻🇳</div>
+          <div class="name">Tiếng Việt</div>
+          <div class="code">베트남어</div>
+        </button>
+      </div>
+    </div>
+
+    <!-- 플레이어 (언어 선택 후 표시) -->
+    <div class="card" id="playerCard" style="display: none;">
+      <h2 class="card-title">
+        <span>🎧</span>
+        <span id="selectedLanguageName">통역 듣기</span>
+      </h2>
+      <div class="player">
+        <div class="player-controls">
+          <button class="btn btn-primary" id="startBtn" onclick="startListening()">
+            <span>▶</span>
+            듣기 시작
+          </button>
+          <button class="btn btn-danger" id="stopBtn" onclick="stopListening()" style="display: none;">
+            <span>⏸</span>
+            일시정지
+          </button>
+          <button class="btn" onclick="changeLanguage()">
+            <span>🔄</span>
+            언어 변경
+          </button>
+        </div>
+
+        <!-- 자막 -->
+        <div class="subtitle-container">
+          <div id="subtitle" class="subtitle-text">
+            자막이 여기에 표시됩니다
+          </div>
+          <div id="subtitleTime" class="subtitle-timestamp"></div>
+        </div>
+
+        <!-- 통찰 질문 -->
+        <div id="reflectionPrompt" class="reflection-prompt" style="display: none;">
+          💭 이 말씀이 당신의 오늘에 어떤 의미입니까?
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 푸터 -->
+  <footer class="footer">
+    <p>&copy; 2026 A4K.ai | Powered by Gemini Multimodal Live API</p>
+  </footer>
+
+  <!-- Socket.IO -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/client.js"></script>
+</body>
+</html>

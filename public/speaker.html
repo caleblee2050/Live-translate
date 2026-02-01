@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>설교자 - 실시간 설교 통역</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;600;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <span class="logo-icon">🎤</span>
+                <div class="logo-text">
+                    <h1>설교자 마이크</h1>
+                    <p>Speaker Microphone</p>
+                </div>
+            </div>
+            <div id="connectionStatus" class="status-badge" style="display: none;">
+                <span class="status-dot"></span>
+                <span>스트리밍 중</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="card">
+            <h2 class="card-title">
+                <span>🎙️</span>
+                마이크 스트리밍
+            </h2>
+
+            <div class="player">
+                <p style="color: var(--text-secondary); margin-bottom: 2rem; text-align: center;">
+                    마이크 버튼을 눌러 설교 음성 스트리밍을 시작하세요.<br>
+                    음성은 자동으로 러시아어, 중국어, 베트남어로 통역됩니다.
+                </p>
+
+                <div class="player-controls">
+                    <button class="btn btn-primary" id="startStreamBtn" onclick="startStreaming()">
+                        <span>🎤</span>
+                        스트리밍 시작
+                    </button>
+                    <button class="btn btn-danger" id="stopStreamBtn" onclick="stopStreaming()" style="display: none;">
+                        <span>⏹</span>
+                        스트리밍 중지
+                    </button>
+                </div>
+
+                <!-- 오디오 레벨 표시 -->
+                <div id="audioLevel" style="margin-top: 2rem; display: none;">
+                    <div style="text-align: center; color: var(--text-secondary); margin-bottom: 0.5rem;">
+                        음성 레벨
+                    </div>
+                    <div style="background: var(--bg-darker); height: 20px; border-radius: 10px; overflow: hidden;">
+                        <div id="levelBar"
+                            style="background: linear-gradient(90deg, var(--success), var(--primary)); height: 100%; width: 0%; transition: width 0.1s;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 청취자 수 -->
+                <div id="listenerCount" style="margin-top: 2rem; text-align: center; color: var(--text-secondary);">
+                    대기 중...
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2026 A4K.ai | Powered by Gemini Multimodal Live API</p>
+    </footer>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/speaker.js"></script>
+</body>
+
+</html>
