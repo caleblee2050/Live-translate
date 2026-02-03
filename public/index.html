@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;600;700&display=swap" rel="stylesheet">
 </head>
+
 <body>
   <!-- 헤더 -->
   <header class="header">
@@ -50,6 +52,11 @@
           <div class="flag">🇻🇳</div>
           <div class="name">Tiếng Việt</div>
           <div class="code">베트남어</div>
+        </button>
+        <button class="language-btn" data-lang="en" onclick="selectLanguage('en')">
+          <div class="flag">🇺🇸</div>
+          <div class="name">English</div>
+          <div class="code">영어</div>
         </button>
       </div>
     </div>
@@ -101,4 +108,5 @@
   <script src="/socket.io/socket.io.js"></script>
   <script src="/js/client.js"></script>
 </body>
+
 </html>

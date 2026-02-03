@@ -27,7 +27,8 @@ function selectLanguage(lang) {
     const languageNames = {
         ru: '🇷🇺 Русский (러시아어)',
         zh: '🇨🇳 中文 (중국어)',
-        vi: '🇻🇳 Tiếng Việt (베트남어)'
+        vi: '🇻🇳 Tiếng Việt (베트남어)',
+        en: '🇺🇸 English (영어)'
     };
     document.getElementById('selectedLanguageName').textContent = languageNames[lang];
 
@@ -227,7 +228,8 @@ function displaySubtitle(text, timestamp) {
     const reflectionPrompts = {
         ru: 'Что это слово значит для вас сегодня?',
         zh: '这句话对你今天有什么意义？',
-        vi: 'Lời này có ý nghĩa gì với bạn hôm nay?'
+        vi: 'Lời này có ý nghĩa gì với bạn hôm nay?',
+        en: 'What does this word mean to you today?'
     };
 
     if (text.includes(reflectionPrompts[selectedLanguage])) {
