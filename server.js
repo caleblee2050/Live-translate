@@ -97,7 +97,7 @@ io.on('connection', (socket) => {
     socket.on('join', (data) => {
         const { language, clientType } = data; // clientType: 'listener' or 'speaker'
 
-        if (!['ru', 'zh', 'vi', 'speaker'].includes(language)) {
+        if (!['ru', 'zh', 'vi', 'en', 'speaker'].includes(language)) {
             socket.emit('error', { message: '지원하지 않는 언어입니다.' });
             return;
         }
