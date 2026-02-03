@@ -220,7 +220,7 @@ async function updateListenerCount() {
         const response = await fetch('/api/status');
         const status = await response.json();
 
-        const total = (status.clients.ru || 0) + (status.clients.zh || 0) + (status.clients.vi || 0);
+        const total = (status.clients.ru || 0) + (status.clients.zh || 0) + (status.clients.vi || 0) + (status.clients.en || 0);
 
         const countHtml = `
       <div style="font-size: 1.5rem; font-weight: 600; margin-bottom: 0.5rem;">
@@ -229,7 +229,8 @@ async function updateListenerCount() {
       <div style="font-size: 0.875rem;">
         🇷🇺 ${status.clients.ru || 0}명 | 
         🇨🇳 ${status.clients.zh || 0}명 | 
-        🇻🇳 ${status.clients.vi || 0}명
+        🇻🇳 ${status.clients.vi || 0}명 |
+        🇺🇸 ${status.clients.en || 0}명
       </div>
     `;
 
