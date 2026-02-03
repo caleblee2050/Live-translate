@@ -38,7 +38,8 @@ const audioProcessor = new AudioProcessor();
 const connectedClients = {
     ru: new Set(),
     zh: new Set(),
-    vi: new Set()
+    vi: new Set(),
+    en: new Set()
 };
 
 /**
