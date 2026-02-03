@@ -65,7 +65,8 @@ async function startStreaming() {
         sourceNode = audioContext.createMediaStreamSource(mediaStream);
 
         // ScriptProcessorNode (오디오 처리)
-        const bufferSize = 4096;
+        // 더 작은 버퍼로 자주 전송하여 지연 감소
+        const bufferSize = 2048;
         processorNode = audioContext.createScriptProcessor(bufferSize, 1, 1);
 
         processorNode.onaudioprocess = (e) => {

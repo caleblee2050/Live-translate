@@ -5,6 +5,12 @@ let audioContext = null;
 let audioQueue = [];
 let isPlaying = false;
 
+// 오디오 버퍼링 시스템
+let audioBufferQueue = [];
+let isBufferPlaying = false;
+let nextPlayTime = 0;
+let gainNode = null;
+
 /**
  * 언어 선택
  */
@@ -100,8 +106,21 @@ function startListening() {
 
     // Web Audio API 초기화
     if (!audioContext) {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        audioContext = new (window.AudioContext || window.webkitAudioContext)({
+            sampleRate: 24000  // Gemini 출력과 동일한 샘플레이트
+        });
     }
+
+    // GainNode 생성 (볼륨 제어 및 연결용)
+    if (!gainNode) {
+        gainNode = audioContext.createGain();
+        gainNode.connect(audioContext.destination);
+    }
+
+    // 버퍼링 시스템 초기화
+    audioBufferQueue = [];
+    isBufferPlaying = false;
+    nextPlayTime = audioContext.currentTime;
 
     document.getElementById('startBtn').style.display = 'none';
     document.getElementById('stopBtn').style.display = 'inline-flex';
@@ -122,10 +141,32 @@ function stopListening() {
 }
 
 /**
- * 오디오 재생
+ * 오디오 재생 (버퍼링 큐 시스템)
  */
 function playAudio(base64Audio) {
+    // 청크를 큐에 추가
+    audioBufferQueue.push(base64Audio);
+
+    // 재생 중이 아니면 처리 시작
+    if (!isBufferPlaying) {
+        processAudioQueue();
+    }
+}
+
+/**
+ * 오디오 큐 처리
+ */
+function processAudioQueue() {
+    if (audioBufferQueue.length === 0) {
+        isBufferPlaying = false;
+        return;
+    }
+
+    isBufferPlaying = true;
+
     try {
+        const base64Audio = audioBufferQueue.shift();
+
         // Base64 디코딩
         const binaryString = atob(base64Audio);
         const bytes = new Uint8Array(binaryString.length);
@@ -146,14 +187,29 @@ function playAudio(base64Audio) {
         const audioBuffer = audioContext.createBuffer(1, float32Array.length, 24000);
         audioBuffer.getChannelData(0).set(float32Array);
 
-        // 재생
+        // 스케줄링된 시간에 재생
         const source = audioContext.createBufferSource();
         source.buffer = audioBuffer;
-        source.connect(audioContext.destination);
-        source.start();
+        source.connect(gainNode);
+
+        // 현재 시간보다 과거라면 즉시 재생
+        const currentTime = audioContext.currentTime;
+        if (nextPlayTime < currentTime) {
+            nextPlayTime = currentTime;
+        }
+
+        source.start(nextPlayTime);
+
+        // 다음 재생 시간 계산 (현재 버퍼 길이만큼 뒤로)
+        nextPlayTime += audioBuffer.duration;
+
+        // 다음 청크 즉시 처리 (스케줄링이므로 즉시 처리해도 됨)
+        // 큐에 있는 청크들을 미리 스케줄링
+        setTimeout(processAudioQueue, 10);
 
     } catch (error) {
         console.error('오디오 재생 오류:', error);
+        isBufferPlaying = false;
     }
 }
 
