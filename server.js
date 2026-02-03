@@ -45,7 +45,7 @@ const connectedClients = {
  * Gemini 핸들러 초기화
  */
 async function initializeGeminiHandlers() {
-    const languages = ['ru', 'zh', 'vi'];
+    const languages = ['ru', 'zh', 'vi', 'en'];
 
     for (const lang of languages) {
         const handler = new GeminiLiveHandler(lang, GEMINI_API_KEY);

@@ -4,60 +4,70 @@
             "ru": "благодать",
             "zh": "恩典",
             "vi": "ân điển",
+            "en": "grace",
             "context": "God's unmerited favor and love"
         },
         "구원": {
             "ru": "спасение",
             "zh": "救恩",
             "vi": "sự cứu rỗi",
+            "en": "salvation",
             "context": "Salvation through Jesus Christ"
         },
         "성령": {
             "ru": "Святой Дух",
             "zh": "圣灵",
             "vi": "Chúa Thánh Thần",
+            "en": "Holy Spirit",
             "context": "The Holy Spirit"
         },
         "복음": {
             "ru": "Евангелие",
             "zh": "福音",
             "vi": "Tin Mừng",
+            "en": "Gospel",
             "context": "The Gospel"
         },
         "회개": {
             "ru": "покаяние",
             "zh": "悔改",
             "vi": "sự ăn năn",
+            "en": "repentance",
             "context": "Repentance"
         },
         "믿음": {
             "ru": "вера",
             "zh": "信心",
             "vi": "đức tin",
+            "en": "faith",
             "context": "Faith"
         },
         "축복": {
             "ru": "благословение",
             "zh": "祝福",
             "vi": "phước lành",
+            "en": "blessing",
             "context": "Blessing"
         },
         "기도": {
             "ru": "молитва",
             "zh": "祷告",
             "vi": "cầu nguyện",
+            "en": "prayer",
             "context": "Prayer"
         },
         "예수님": {
             "ru": "Иисус",
             "zh": "耶稣",
             "vi": "Chúa Giê-su",
+            "en": "Jesus",
             "context": "Jesus Christ"
         },
         "하나님": {
             "ru": "Бог",
             "zh": "上帝",
             "vi": "Đức Chúa Trời",
+            "en": "God",
             "context": "God"
         }
     },
@@ -65,44 +75,52 @@
         "아브라함": {
             "ru": "Авраам",
             "zh": "亚伯拉罕",
-            "vi": "Áp-ra-ham"
+            "vi": "Áp-ra-ham",
+            "en": "Abraham"
         },
         "모세": {
             "ru": "Моисей",
             "zh": "摩西",
-            "vi": "Môi-se"
+            "vi": "Môi-se",
+            "en": "Moses"
         },
         "다윗": {
             "ru": "Давид",
             "zh": "大卫",
-            "vi": "Đa-vít"
+            "vi": "Đa-vít",
+            "en": "David"
         },
         "바울": {
             "ru": "Павел",
             "zh": "保罗",
-            "vi": "Phao-lô"
+            "vi": "Phao-lô",
+            "en": "Paul"
         },
         "베드로": {
             "ru": "Петр",
             "zh": "彼得",
-            "vi": "Phi-e-rơ"
+            "vi": "Phi-e-rơ",
+            "en": "Peter"
         }
     },
     "biblicalPlaces": {
         "예루살렘": {
             "ru": "Иерусалим",
             "zh": "耶路撒冷",
-            "vi": "Giê-ru-sa-lem"
+            "vi": "Giê-ru-sa-lem",
+            "en": "Jerusalem"
         },
         "갈릴리": {
             "ru": "Галилея",
             "zh": "加利利",
-            "vi": "Ga-li-lê"
+            "vi": "Ga-li-lê",
+            "en": "Galilee"
         },
         "베들레헴": {
             "ru": "Вифлеем",
             "zh": "伯利恒",
-            "vi": "Bết-lê-hem"
+            "vi": "Bết-lê-hem",
+            "en": "Bethlehem"
         }
     }
 }
