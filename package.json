@@ -20,6 +20,8 @@
   "license": "MIT",
   "dependencies": {
     "@google-cloud/media-translation": "^5.2.1",
+    "@google-cloud/speech": "^7.2.1",
+    "@google-cloud/text-to-speech": "^6.4.0",
     "@google/genai": "^1.39.0",
     "@google/generative-ai": "^0.21.0",
     "dotenv": "^16.3.1",

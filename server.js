@@ -4,8 +4,11 @@ import { Server } from 'socket.io';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
-import GeminiLiveHandler from './lib/gemini-handler.js';
-import AudioProcessor from './lib/audio-processor.js';
+
+// 새 파이프라인 핸들러들
+import STTHandler from './lib/stt-handler.js';
+import TranslationHandler from './lib/translation-handler.js';
+import TTSHandler from './lib/tts-handler.js';
 
 // ES 모듈에서 __dirname 구하기
 const __filename = fileURLToPath(import.meta.url);
@@ -30,9 +33,10 @@ const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 app.use(express.static(join(__dirname, 'public')));
 app.use(express.json());
 
-// 언어별 Gemini 핸들러
-const geminiHandlers = {};
-const audioProcessor = new AudioProcessor();
+// 파이프라인 핸들러들
+let sttHandler = null;
+let translationHandler = null;
+let ttsHandler = null;
 
 // 연결된 클라이언트 관리
 const connectedClients = {
@@ -43,49 +47,111 @@ const connectedClients = {
 };
 
 /**
- * Gemini 핸들러 초기화
+ * 파이프라인 핸들러 초기화
  */
-async function initializeGeminiHandlers() {
-    const languages = ['ru', 'zh', 'vi', 'en'];
+async function initializePipeline() {
+    try {
+        // STT 핸들러
+        sttHandler = new STTHandler();
 
-    for (const lang of languages) {
-        const handler = new GeminiLiveHandler(lang, GEMINI_API_KEY);
-
-        // 오디오 응답 콜백
-        handler.on('audioResponse', (audioBuffer, language) => {
-            // 해당 언어 룸의 모든 클라이언트에게 브로드캐스트
-            io.to(`lang:${language}`).emit('audio', {
-                language,
-                audio: audioBuffer.toString('base64')
-            });
-        });
-
-        // 텍스트(자막) 응답 콜백
-        handler.on('textResponse', (text, language) => {
-            io.to(`lang:${language}`).emit('subtitle', {
-                language,
+        // STT 중간 결과 → 원어 자막 전송
+        sttHandler.on('interimResult', (text) => {
+            io.to('lang:speaker').emit('source-subtitle', {
                 text,
+                isFinal: false,
                 timestamp: Date.now()
             });
-        });
-
-        // 에러 콜백
-        handler.on('error', (error, language) => {
-            console.error(`Gemini 에러 [${language}]:`, error);
-            io.to(`lang:${language}`).emit('error', {
-                message: '통역 서비스에 문제가 발생했습니다.'
+            // 모든 언어 룸에도 원어 자막 전송
+            ['ru', 'zh', 'vi', 'en'].forEach(lang => {
+                io.to(`lang:${lang}`).emit('source-subtitle', {
+                    text,
+                    isFinal: false,
+                    timestamp: Date.now()
+                });
             });
         });
 
-        // 연결
-        try {
-            await handler.connect();
-            geminiHandlers[lang] = handler;
-            console.log(`✅ Gemini 핸들러 초기화 완료 [${lang}]`);
-        } catch (error) {
-            console.error(`❌ Gemini 핸들러 초기화 실패 [${lang}]:`, error);
-        }
+        // STT 최종 결과 → 번역 및 TTS 트리거
+        sttHandler.on('finalResult', async (text) => {
+            // 원어 최종 자막 전송
+            io.to('lang:speaker').emit('source-subtitle', {
+                text,
+                isFinal: true,
+                timestamp: Date.now()
+            });
+            ['ru', 'zh', 'vi', 'en'].forEach(lang => {
+                io.to(`lang:${lang}`).emit('source-subtitle', {
+                    text,
+                    isFinal: true,
+                    timestamp: Date.now()
+                });
+            });
+
+            // 각 언어로 번역 및 TTS 생성
+            await processTranslation(text);
+        });
+
+        sttHandler.on('error', (error) => {
+            console.error('❌ STT 오류:', error.message);
+        });
+
+        // 번역 핸들러
+        translationHandler = new TranslationHandler(GEMINI_API_KEY);
+        console.log('✅ 번역 핸들러 초기화 완료');
+
+        // TTS 핸들러
+        ttsHandler = new TTSHandler();
+        console.log('✅ TTS 핸들러 초기화 완료');
+
+        console.log('✅ STT → 번역 → TTS 파이프라인 준비 완료');
+
+    } catch (error) {
+        console.error('❌ 파이프라인 초기화 실패:', error);
+        throw error;
     }
+}
+
+/**
+ * 번역 및 TTS 처리
+ */
+async function processTranslation(koreanText) {
+    if (!koreanText || koreanText.trim().length < 2) return;
+
+    const languages = ['ru', 'zh', 'vi', 'en'];
+
+    // 병렬로 모든 언어 처리
+    await Promise.all(languages.map(async (lang) => {
+        try {
+            // 해당 언어에 청취자가 있는지 확인
+            if (connectedClients[lang].size === 0) {
+                return;
+            }
+
+            // 1. 번역
+            const translatedText = await translationHandler.translate(koreanText, lang);
+
+            // 2. 번역 자막 전송
+            io.to(`lang:${lang}`).emit('subtitle', {
+                language: lang,
+                text: translatedText,
+                timestamp: Date.now()
+            });
+
+            // 3. TTS 생성
+            const audioBuffer = await ttsHandler.synthesize(translatedText, lang);
+
+            if (audioBuffer) {
+                // 4. 오디오 전송
+                io.to(`lang:${lang}`).emit('audio', {
+                    language: lang,
+                    audio: audioBuffer.toString('base64')
+                });
+            }
+
+        } catch (error) {
+            console.error(`❌ 처리 오류 [${lang}]:`, error.message);
+        }
+    }));
 }
 
 /**
@@ -96,7 +162,7 @@ io.on('connection', (socket) => {
 
     // 언어 선택 및 룸 참여
     socket.on('join', (data) => {
-        const { language, clientType } = data; // clientType: 'listener' or 'speaker'
+        const { language, clientType } = data;
 
         if (!['ru', 'zh', 'vi', 'en', 'speaker'].includes(language)) {
             socket.emit('error', { message: '지원하지 않는 언어입니다.' });
@@ -136,15 +202,9 @@ io.on('connection', (socket) => {
             // Base64 디코딩
             const audioBuffer = Buffer.from(data.audio, 'base64');
 
-            console.log(`🎙️ 오디오 수신: ${audioBuffer.length} bytes`);
-
-            // 모든 언어 핸들러로 전송 (재연결은 streamAudio 내부에서 처리)
-            for (const [lang, handler] of Object.entries(geminiHandlers)) {
-                try {
-                    await handler.streamAudio(audioBuffer);
-                } catch (err) {
-                    console.error(`❌ 오디오 전송 실패 [${lang}]:`, err.message);
-                }
+            // STT로 전송
+            if (sttHandler) {
+                sttHandler.sendAudio(audioBuffer);
             }
         } catch (error) {
             console.error('오디오 스트림 처리 오류:', error);
@@ -164,50 +224,12 @@ io.on('connection', (socket) => {
                 listeners: connectedClients[socket.language].size
             });
         }
-    });
-});
 
-/**
- * 관리자 API: 컨텍스트 주입
- */
-app.post('/api/inject-context', async (req, res) => {
-    try {
-        const { sermonText, keywords } = req.body;
-
-        console.log('📝 컨텍스트 주입 요청 수신...');
-        console.log('   설교 본문:', sermonText?.substring(0, 50) + '...');
-        console.log('   키워드:', keywords);
-
-        // 모든 언어 핸들러에 컨텍스트 주입 (세션 재연결 대기)
-        const results = await Promise.all(
-            Object.entries(geminiHandlers).map(async ([lang, handler]) => {
-                try {
-                    const success = await handler.injectContext(sermonText, keywords);
-                    return { lang, success };
-                } catch (error) {
-                    console.error(`❌ 컨텍스트 주입 실패 [${lang}]:`, error.message);
-                    return { lang, success: false };
-                }
-            })
-        );
-
-        const allSuccess = results.every(r => r.success);
-        const failedLangs = results.filter(r => !r.success).map(r => r.lang);
-
-        if (allSuccess) {
-            console.log('✅ 모든 언어에 컨텍스트 적용 완료');
-            res.json({ success: true, message: '컨텍스트가 모든 언어에 적용되었습니다.' });
-        } else {
-            console.log('⚠️ 일부 언어 컨텍스트 적용 실패:', failedLangs);
-            res.json({
-                success: true,
-                message: `컨텍스트가 적용되었습니다. (일부 언어 재연결 실패: ${failedLangs.join(', ')})`
-            });
+        // 설교자 연결 해제 시 STT 스트리밍 중지
+        if (socket.clientType === 'speaker' && sttHandler) {
+            sttHandler.stopStreaming();
         }
-    } catch (error) {
-        console.error('컨텍스트 주입 오류:', error);
-        res.status(500).json({ success: false, message: error.message });
-    }
+    });
 });
 
 /**
@@ -216,14 +238,13 @@ app.post('/api/inject-context', async (req, res) => {
 app.get('/api/status', (req, res) => {
     const status = {
         server: 'running',
-        gemini: {},
+        pipeline: {
+            stt: sttHandler ? 'ready' : 'not initialized',
+            translation: translationHandler ? 'ready' : 'not initialized',
+            tts: ttsHandler ? 'ready' : 'not initialized'
+        },
         clients: {}
     };
-
-    // Gemini 핸들러 상태
-    Object.entries(geminiHandlers).forEach(([lang, handler]) => {
-        status.gemini[lang] = handler.isConnected ? 'connected' : 'disconnected';
-    });
 
     // 클라이언트 수
     Object.entries(connectedClients).forEach(([lang, clients]) => {
@@ -245,9 +266,9 @@ async function start() {
             process.exit(1);
         }
 
-        // Gemini 핸들러 초기화
-        console.log('🚀 Gemini Live API 연결 중...');
-        await initializeGeminiHandlers();
+        // 파이프라인 초기화
+        console.log('🚀 STT → 번역 → TTS 파이프라인 초기화 중...');
+        await initializePipeline();
 
         // HTTP 서버 시작
         httpServer.listen(PORT, () => {
@@ -257,8 +278,8 @@ async function start() {
             console.log(`🌐 서버 주소: http://localhost:${PORT}`);
             console.log(`👥 청취자 페이지: http://localhost:${PORT}`);
             console.log(`🎤 설교자 페이지: http://localhost:${PORT}/speaker.html`);
-            console.log(`⚙️  관리자 페이지: http://localhost:${PORT}/admin.html`);
             console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            console.log('📡 파이프라인: STT → Gemini 번역 → TTS');
             console.log('');
         });
     } catch (error) {
@@ -271,10 +292,10 @@ async function start() {
 process.on('SIGINT', () => {
     console.log('\n🛑 서버 종료 중...');
 
-    // Gemini 핸들러 연결 해제
-    Object.values(geminiHandlers).forEach(handler => {
-        handler.disconnect();
-    });
+    // STT 스트리밍 중지
+    if (sttHandler) {
+        sttHandler.stopStreaming();
+    }
 
     httpServer.close(() => {
         console.log('✅ 서버 종료 완료');
