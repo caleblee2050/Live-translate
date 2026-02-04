@@ -30,7 +30,21 @@ function selectLanguage(lang) {
         vi: '🇻🇳 Tiếng Việt (베트남어)',
         en: '🇺🇸 English (영어)'
     };
+
+    const languageBadges = {
+        ru: '🇷🇺 러시아어',
+        zh: '🇨🇳 중국어',
+        vi: '🇻🇳 베트남어',
+        en: '🇺🇸 영어'
+    };
+
     document.getElementById('selectedLanguageName').textContent = languageNames[lang];
+
+    // 번역어 배지 업데이트
+    const badge = document.getElementById('targetLangBadge');
+    if (badge) {
+        badge.textContent = languageBadges[lang];
+    }
 
     // 플레이어 카드 표시
     document.getElementById('languageSelection').style.display = 'none';
@@ -96,6 +110,11 @@ function connectToServer() {
     socket.on('disconnect', () => {
         console.log('⚠️  서버 연결 해제');
         document.getElementById('connectionStatus').style.display = 'none';
+    });
+
+    // 원어(한국어) 자막 수신
+    socket.on('source-subtitle', (data) => {
+        displaySourceSubtitle(data.text, data.timestamp);
     });
 }
 
@@ -215,7 +234,7 @@ function processAudioQueue() {
 }
 
 /**
- * 자막 표시
+ * 자막 표시 (번역어)
  */
 function displaySubtitle(text, timestamp) {
     const subtitleEl = document.getElementById('subtitle');
@@ -234,6 +253,21 @@ function displaySubtitle(text, timestamp) {
 
     if (text.includes(reflectionPrompts[selectedLanguage])) {
         showReflectionPrompt(text);
+    }
+}
+
+/**
+ * 원어 자막 표시 (한국어)
+ */
+function displaySourceSubtitle(text, timestamp) {
+    const sourceTextEl = document.getElementById('sourceText');
+    const sourceTimeEl = document.getElementById('sourceTime');
+
+    if (sourceTextEl) {
+        sourceTextEl.textContent = text;
+    }
+    if (sourceTimeEl) {
+        sourceTimeEl.textContent = new Date(timestamp).toLocaleTimeString('ko-KR');
     }
 }
 

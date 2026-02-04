@@ -83,12 +83,37 @@
           </button>
         </div>
 
-        <!-- 자막 -->
-        <div class="subtitle-container">
-          <div id="subtitle" class="subtitle-text">
-            자막이 여기에 표시됩니다
+        <!-- 자막 영역 -->
+        <div class="subtitle-container"
+          style="background: var(--bg-darker); border-radius: 12px; padding: 1.5rem; margin-top: 1.5rem;">
+          <!-- 원어 (한국어) -->
+          <div style="margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border);">
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+              <span
+                style="background: #3b82f6; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem;">🇰🇷
+                원어</span>
+              <span id="sourceTime" style="color: var(--text-secondary); font-size: 0.75rem;"></span>
+            </div>
+            <div id="sourceText" class="subtitle-text"
+              style="color: var(--text-secondary); font-size: 1rem; min-height: 1.5rem;">
+              원어 자막이 여기에 표시됩니다
+            </div>
           </div>
-          <div id="subtitleTime" class="subtitle-timestamp"></div>
+
+          <!-- 번역어 -->
+          <div>
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+              <span id="targetLangBadge"
+                style="background: #10b981; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem;">🌐
+                번역</span>
+              <span id="subtitleTime" class="subtitle-timestamp"
+                style="color: var(--text-secondary); font-size: 0.75rem;"></span>
+            </div>
+            <div id="subtitle" class="subtitle-text"
+              style="color: var(--text-primary); font-size: 1.25rem; font-weight: 500; min-height: 2rem;">
+              번역된 자막이 여기에 표시됩니다
+            </div>
+          </div>
         </div>
 
         <!-- 통찰 질문 -->
