@@ -35,10 +35,26 @@
             </h2>
 
             <div class="player">
-                <p style="color: var(--text-secondary); margin-bottom: 2rem; text-align: center;">
+                <p style="color: var(--text-secondary); margin-bottom: 1.5rem; text-align: center;">
                     마이크 버튼을 눌러 설교 음성 스트리밍을 시작하세요.<br>
                     음성은 자동으로 러시아어, 중국어, 베트남어, 영어로 통역됩니다.
                 </p>
+
+                <!-- 오디오 입력 장치 선택 -->
+                <div style="margin-bottom: 1.5rem;">
+                    <label for="audioInputSelect"
+                        style="display: block; color: var(--text-secondary); margin-bottom: 0.5rem; text-align: center;">
+                        🎚️ 오디오 입력 장치 선택
+                    </label>
+                    <select id="audioInputSelect"
+                        style="width: 100%; padding: 0.75rem 1rem; border-radius: 8px; background: var(--bg-darker); border: 1px solid var(--border); color: var(--text-primary); font-size: 1rem; cursor: pointer;">
+                        <option value="">기본 마이크</option>
+                    </select>
+                    <p
+                        style="color: var(--text-secondary); font-size: 0.75rem; margin-top: 0.5rem; text-align: center;">
+                        💡 믹서에서 오디오가 입력되는 장치를 선택하세요 (예: USB Audio, Line In)
+                    </p>
+                </div>
 
                 <div class="player-controls">
                     <button class="btn btn-primary" id="startStreamBtn" onclick="startStreaming()">

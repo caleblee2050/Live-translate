@@ -4,6 +4,7 @@ let audioContext = null;
 let sourceNode = null;
 let processorNode = null;
 let isStreaming = false;
+let selectedDeviceId = null; // 선택된 오디오 입력 장치 ID
 
 /**
  * 서버 연결
@@ -47,14 +48,27 @@ function connectToServer() {
  */
 async function startStreaming() {
     try {
-        // 마이크 권한 요청
+        // 선택된 오디오 입력 장치 가져오기
+        const audioSelect = document.getElementById('audioInputSelect');
+        selectedDeviceId = audioSelect.value || undefined;
+
+        // 오디오 설정 구성
+        const audioConstraints = {
+            echoCancellation: false,  // 믹서 입력 시 에코 캔슬 비활성화 (깨끗한 원음)
+            noiseSuppression: false,  // 노이즈 억제 비활성화 (원음 유지)
+            autoGainControl: false,   // 자동 게인 비활성화 (믹서에서 조정)
+            sampleRate: 48000
+        };
+
+        // 특정 장치가 선택된 경우 deviceId 추가
+        if (selectedDeviceId) {
+            audioConstraints.deviceId = { exact: selectedDeviceId };
+            console.log('🎚️ 선택된 장치 ID:', selectedDeviceId);
+        }
+
+        // 마이크/오디오 입력 권한 요청
         mediaStream = await navigator.mediaDevices.getUserMedia({
-            audio: {
-                echoCancellation: true,
-                noiseSuppression: true,
-                autoGainControl: true,
-                sampleRate: 48000
-            }
+            audio: audioConstraints
         });
 
         // Web Audio API 초기화
@@ -240,11 +254,43 @@ async function updateListenerCount() {
     }
 }
 
+/**
+ * 오디오 입력 장치 목록 로드
+ */
+async function loadAudioDevices() {
+    try {
+        // 먼저 권한을 요청해야 장치 이름이 표시됨
+        await navigator.mediaDevices.getUserMedia({ audio: true })
+            .then(stream => stream.getTracks().forEach(track => track.stop()));
+
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const audioInputs = devices.filter(device => device.kind === 'audioinput');
+
+        const select = document.getElementById('audioInputSelect');
+        select.innerHTML = '<option value="">기본 마이크</option>';
+
+        audioInputs.forEach(device => {
+            const option = document.createElement('option');
+            option.value = device.deviceId;
+            option.textContent = device.label || `마이크 ${select.options.length}`;
+            select.appendChild(option);
+        });
+
+        console.log(`🎚️ ${audioInputs.length}개 오디오 입력 장치 발견`);
+    } catch (error) {
+        console.error('오디오 장치 목록 로드 오류:', error);
+    }
+}
+
 // 페이지 로드 시 초기화
 document.addEventListener('DOMContentLoaded', () => {
     connectToServer();
     updateListenerCount();
+    loadAudioDevices(); // 오디오 장치 목록 로드
 
     // 5초마다 청취자 수 업데이트
     setInterval(updateListenerCount, 5000);
+
+    // 장치 변경 감지 (USB 장치 연결/해제 시)
+    navigator.mediaDevices.addEventListener('devicechange', loadAudioDevices);
 });
